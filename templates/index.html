@@ -1,0 +1,89 @@
+<!DOCTTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Leads Dashboard</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script>
+            window.onload = function() {
+            
+            var chart = new CanvasJS.Chart("chartContainer", {
+                theme: "light2", // "light1", "light2", "dark1", "dark2"
+                exportEnabled: true,
+                animationEnabled: true,
+                title: {
+                    text: "Customers and Number of New Leads"
+                },
+                data: [{
+                    type: "pie",
+                    startAngle: 25,
+                    toolTipContent: "<b>{label}</b>: {y}",
+                    showInLegend: "true",
+                    legendText: "{label}",
+                    indexLabelFontSize: 16,
+                    indexLabel: "{label} - {y}",                                      
+                    dataPoints: [
+                        {% for customer in lead_data %}
+                            { y: {{ customer.leads }}, label: "{{ customer.first_name }} {{customer.last_name}}" },
+                        {% endfor %}
+                    ]
+                }]
+            });
+            chart.render();
+            
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container bg-light">
+            <nav class="navbar navbar-light bg-dark">
+                <a class="navbar-brand text-white" href="/">Report Dashboard</a>
+            </nav>
+            <div class="container-fluid bg-light">
+                <div class="row justify-content-end mt-2 mr-4 mb-2">
+                    <div class="column">
+                        <form action='/set_date', method='post' class="form-inline" >
+                            <div class="form-group mb-2">
+                                <label for="start_date" class="mr-2">Start Date</label>
+                                <input type="date" id="start_date" class="form-control" name="start_date" format="mm/dd/yyyy" placeholder="dd/mm/yyyy">
+                                <img style="height: 30px" class="ml-1" src="{{ url_for('static', filename='img/calendar.png') }}" alt="calendar">
+                            </div>
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="end" class="mr-2">End Date</label>
+                                <input type="date" id="end_date" class="form-control" name="end_date" format="mm/dd/yyyy" placeholder="dd/mm/yyyy">
+                                <img style="height: 30px" class="ml-1" src="{{ url_for('static', filename='img/calendar.png') }}" alt="calendar">
+                            </div>
+                                <button type="submit" class="btn btn-primary mb-2">Update</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="jumbotron jumbotron-fluid bg-light">
+                    <div class="container">
+                        <h2 class="display-5 text-center">List of all customers and # of leads</h2>
+                        <hr class="my-4">
+                        <table class="table table-striped table-bordered">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">Customer Name</th>
+                                    <th scope="col">Number of Leads</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in lead_data %}
+                                    <tr>
+                                        <td>{{ customer.first_name }} {{customer.last_name }}</td>
+                                        <td>{{ customer.leads }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr class="my-4">
+                        <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+                        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
